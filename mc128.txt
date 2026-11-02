@@ -46,7 +46,8 @@
   370 pokea+14,dec("20"):pokea+15,dec("74"):pokea+16,dec("ff")
   380 a=a+17:u=u+1:p=0:goto120
   390 rem  .. find
-  400 n=0:v=0:ifpeek(u)<65then420:rem print "peek(u="u"):"peek(u)
+  400 n=0:v=0:ifpeek(u)=209then1771
+  405 ifpeek(u)<65then420:rem print "peek(u="u"):"peek(u)
   410 ifpeek(u)<91then490
   420 t=0:ifpeek(u)=170thenu=u+1:goto440
   430 ifpeek(u)=171thenu=u+1:t=1
@@ -197,11 +198,14 @@
  1762 pokea+8,dec("a0"):pokea+9,0
  1763 pokea+10,dec("20"):pokea+11,dec("77"):pokea+12,dec("ff")
  1769 a=a+13:return
- 1770 rem  .. dec
- 1771 u=u+1:ifpeek(u)<>40then920
- 1772 u=u+1:gosub100:pokea,dec("85"):pokea+1,dec("24")
- 1773 pokea+2,dec("86"):pokea+3,dec("25"):a=a+4
- 1779 return
+ 1770 rem  .. dec("hex") -> konstante
+ 1771 u=u+1:d=0:ifpeek(u)<>40orpeek(u+1)<>34thenprint"dec: (";chr$(34);" erwartet":ee=ee+1:goto570
+ 1772 u=u+2
+ 1773 t=peek(u)and127:ift>47andt<58thenn=n*16+t-48:u=u+1:goto1773
+ 1774 ift>64andt<71thenn=n*16+t-55:u=u+1:goto1773
+ 1775 ifpeek(u)<>34orpeek(u+1)<>41thenprint"dec: ungueltiger hex-string":ee=ee+1:goto570
+ 1776 u=u+2:ifn>65535thenprint"dec: wert zu gross":ee=ee+1:goto570
+ 1779 d=n:goto570
  1780 rem  .. bank
  1781 gosub100:pokea,dec("8d"):pokea+1,dec("d5"):pokea+2,dec("03")
  1782 a=a+3:return
