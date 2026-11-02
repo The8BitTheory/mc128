@@ -1,0 +1,271 @@
+    1 deffnw(zz)=peek(zz)+peek(zz+1)*256
+    2 bs=fnw(45)
+    3 be=fnw(4624)
+    4 vs=512
+   10 printchr$(147);"micro compiler c128"
+   15 print"von victor h. cortes"
+   16 print"c128 port von goodwell"
+   17 print
+   20 g=0:gosub1800:goto590
+   30 rem  .. erste variable
+   40 gosub400:pokea,169:pokea+1,l:k=2
+   50 ifvthenpokea,173:pokea+2,h:k=3
+   60 a=a+k:pokea,174:pokea+1,c:pokea+2,h
+   70 ifv=0thenpokea,162:pokea+1,h
+   80 a=a+k:return
+   90 rem  .. ausdruck
+  100 p=0:ifpeek(u)=194thenu=u+2:p=1
+  110 gosub40
+  120 ifu>2900thenprint"overflow":ee=ee+1:return
+  130 o=0:b=peek(u):ifb=173then280
+  140 ifb=172then280
+  150 ifb=170theno=109:pokea,24:a=a+1
+  160 ifb=171theno=237:pokea,56:a=a+1
+  170 ifb=175theno=45
+  180 ifb=176theno=13
+  190 ifo=0then320
+  200 u=u+1:gosub400:pokea,o-4:pokea+1,l:k=2
+  210 ifvthenpokea,o:pokea+2,h:k=3
+  220 a=a+k:pokea,168:pokea+1,138:a=a+2
+  230 pokea,o:pokea+1,c:pokea+2,h
+  240 ifv=0thenpokea,o-4:pokea+1,h
+  250 a=a+k:pokea,170:pokea+1,152:a=a+2
+  260 goto120
+  270 rem  .. mul/div
+  280 pokea,133:pokea+1,99:pokea+2,134:pokea+3,100:a=a+4:u=u+1:gosub40
+  290 g=1:pokea,24:ifb=173thenpokea,56
+  300 d=s+3:gosub570:pokea+1,32:pokea+2,l:pokea+3,h:a=a+4:goto120
+  310 rem  .. peek(ausdruck)
+  320 ifp=0thenreturn
+  330 pokea,dec("85"):pokea+1,dec("fa")
+  340 pokea+2,dec("86"):pokea+3,dec("fb")
+  342 pokea+4,dec("a9"):pokea+5,dec("fa")
+  344 pokea+6,dec("8d"):pokea+7,dec("aa"):pokea+8,dec("02")
+  350 pokea+9,dec("ae"):pokea+10,dec("d5"):pokea+11,dec("03")
+  360 pokea+12,dec("a0"):pokea+13,0
+  370 pokea+14,dec("20"):pokea+15,dec("74"):pokea+16,dec("ff")
+  380 a=a+17:u=u+1:p=0:goto120
+  390 rem  .. find
+  400 n=0:v=0:ifpeek(u)<65then420:rem print "peek(u="u"):"peek(u)
+  410 ifpeek(u)<91then490
+  420 t=0:ifpeek(u)=170thenu=u+1:goto440
+  430 ifpeek(u)=171thenu=u+1:t=1
+  440 ifpeek(u)<48orpeek(u)>57thenprint"(find) error bei";u-2815;peek(u):ee=ee+1
+  450 ifpeek(u)>47andpeek(u)<58thenn=n*10+peek(u)-48:u=u+1:goto450
+  460 ift=0thend=n:goto570
+  470 d=65536-n:goto570
+  480 rem  .. h/l
+  490 v=peek(u):d=v
+  500 u=u+1:t=peek(u):ift>90then560
+  510 ift<32then560
+  520 ift=59then560
+  530 ift=44then560
+  540 ift=41then560
+  550 ift>35then500
+  560 d=d-65:d=d+d+vs
+  570 h%=d/256:h=h%:l=d-h*256:c=(l+1)and255:return
+  580 rem  .. source lesen
+  590 get#2,a1$,a2$:ti$="000000":rem print " sl: a"asc(a1$)","asc(a2$)
+  600 get#2,l1$,l2$:t=asc(l1$+z$)+asc(l2$+z$):ift=0then1960:rem print " sl l:"asc(l1$)","asc(l2$)",t="t:
+  610 get#2,s1$,s2$:t=asc(s1$+z$)+asc(s2$+z$)*256:rem print " sl s:"asc(s1$)","asc(s2$)",t="t
+  620 s(m)=t:l(m)=a:m=m+1:print"{left}";t;
+  630 iffthent=a-f:pokef+1,t-2:pokef+7,t-8:pokef+9,t-10:f=0
+  640 j=2816:b7=0
+  650 get#2,b$:ifstthen1960
+  660 b=asc(b$+z$):pokej,b:ifqorb<>32orb7thenj=j+1:rem print "poke j="j",b="b
+  670 ifb=34andnotb7thenq=notq
+  675 ifb=254andq=0thenj=j-1:b7=-1:goto650
+  680 ifb<128andnotb7orqthenprintb$;
+  690 poke17,0:poke85,0:pokej,0:x=j-2:poke3057,xand255:poke3061,x/256
+  695 c1=b7:c2=b>127andb<254andb<>206:poke3065,b:poke8,1:ifc1thenpoke3065,254:poke8,0
+  696 if(c1orc2)andq=0thenpoke768,185:sys3056
+  710 ifqthen650
+  720 ifnotb7andb<32thenprint:gosub770:goto600
+  725 ifb7thenb7=0:goto650
+  730 ifb=167thengosub770:goto640
+  740 ifb=58thenj=j-1:gosub770:goto640
+  750 goto650
+  760 rem  .. befehl
+  770 b=peek(2816):u=2817:pokej,0:pokej+1,0
+  780 ifb=136thengoto940
+  790 ifb=128orb=142orb=144thenpokea,96:a=a+1:return
+  800 ifb=158then1680
+  810 ifb=139then1040
+  820 ifb=153then1170
+  830 ifb=151then1720
+  840 ifb=129then1510
+  850 ifb=130then1650
+  860 ifb=143thenreturn
+  870 ifb=137theno=76:goto1480
+  880 ifb=141theno=32:goto1480
+  882 ifb=2then1781
+  890 ifb<48orb>90then920
+  900 ifb>64then950
+  910 ifb<58thenu=2816:o=76:goto1480
+  920 print"error";u-2815;peek(u):ee=ee+1:return
+  930 rem  .. v=ausdruck
+  940 fori=2816to2830:pokei,peek(i+1):next
+  950 u=2816:ifpeek(u)<65then920
+  960 ifpeek(u)>90then920
+  970 u=u+1:ifpeek(u)<>178then920
+  980 u=u+1:gosub100:d=peek(2816)
+  990 gosub560
+ 1000 pokea,141:pokea+1,l:pokea+2,h
+ 1010 pokea+3,142:pokea+4,c:pokea+5,h
+ 1020 a=a+6:return
+ 1030 rem  .. if/then
+ 1040 gosub100:w=peek(u):ifw<177then920
+ 1050 ifw>179then920
+ 1060 pokea+0,133:pokea+1,36:pokea+2,134:pokea+3,37:a=a+4:u=u+1
+ 1070 ifw=179andpeek(u)=177thenw=180:u=u+1
+ 1080 ifw=177andpeek(u)=179thenw=180:u=u+1
+ 1090 gosub100:pokea,228:pokea+1,37:pokea+2,240:pokea+3,4:a=a+4:f=a
+ 1100 pokea+3,6:pokea+4,197:pokea+5,36
+ 1110 pokea,240:pokea+2,208:pokea+8,240
+ 1120 ifw=178thenpokea,208:pokea+8,208
+ 1130 ifw=179thenpokea,144:pokea+2,176
+ 1140 ifw=177thenpokea,176:pokea+2,144
+ 1150 pokea+6,peek(a):a=a+10:return
+ 1160 rem  .. print
+ 1170 w=peek(u):ifw<32then1450
+ 1180 ifw=59andpeek(u+1)<32thenreturn
+ 1190 ifw=59thenu=u+1:goto1170
+ 1200 ifw=199then1300:rem  chr$
+ 1210 ifw=34then1340:rem  "string"
+ 1220 rem  .. print ausdruck
+ 1230 pokea,169:pokea+1,29:pokea+2,32
+ 1240 pokea+3,210:pokea+4,255:a=a+5
+ 1250 gosub100:pokea,134:pokea+1,dec("6")
+ 1260 pokea+2,133:pokea+3,dec("7")
+ 1272 pokea+4,dec("a9"):pokea+5,dec("8e")
+ 1273 pokea+6,dec("85")::pokea+7,dec("3")
+ 1274 pokea+8,dec("a9"):pokea+9,dec("32")
+ 1275 pokea+10,dec("85"):pokea+11,dec("4")
+ 1276 pokea+12,dec("a9"):pokea+13,dec("f")
+ 1277 pokea+14,dec("85"):pokea+15,dec("2")
+ 1278 pokea+16,dec("20"):pokea+17,dec("6e"):pokea+18,dec("ff")
+ 1280 a=a+19:goto1170
+ 1290 rem  .. print chr$(ausdruck)
+ 1300 u=u+1:ifpeek(u)<>40then920
+ 1310 u=u+1:gosub100:pokea,32:pokea+1,210
+ 1320 pokea+2,255:a=a+3:u=u+1:goto1170
+ 1330 rem  .. print "string"
+ 1340 pokea,32:pokea+1,125:pokea+2,255
+ 1380 a=a+3:i=0
+ 1390 i=i+1:u=u+1:ifu>2900then1430
+ 1400 ifpeek(u)=34then1430
+ 1410 ifpeek(u)=0then1430
+ 1420 pokea,peek(u):a=a+1:goto1390
+ 1430 pokea,0:a=a+1
+ 1440 u=u+1:goto1170
+ 1450 pokea,169:pokea+1,13:pokea+2,32
+ 1460 pokea+3,210:pokea+4,255:a=a+5:return
+ 1470 rem  .. gosub/goto
+ 1480 pokea,o:pokea+1,0:pokea+2,0:gosub400
+ 1490 r=r+1:n(r)=n:a(r)=a:a=a+3:return
+ 1500 rem  .. for
+ 1510 u=2819:gosub100
+ 1520 lp=a:pokea,76:a=a+3
+ 1530 hu=u:u=2817:gosub40:u=hu+1
+ 1540 pokea,133:pokea+1,36:pokea+2,134:pokea+3,37:a=a+4
+ 1550 hf=f:w=177:gosub1090:f=hf
+ 1560 pokea-1,3:pokea-3,2:pokea-9,11
+ 1570 pokea-2,176:pokea-4,240
+ 1580 xa=a:pokea,76:a=a+3
+ 1590 ifpeek(u)<>169thenpokea,169:pokea+1,1:pokea+2,162:pokea+3,0:a=a+4:goto1610
+ 1600 u=u+1:gosub100
+ 1610 u=2816:b=170:gosub150
+ 1620 d=a:gosub570:pokelp+1,l:pokelp+2,h
+ 1630 d=peek(2817):gosub990:return
+ 1640 rem  .. next
+ 1650 d=lp+3:gosub570:pokea,76:pokea+1,l:pokea+2,h:a=a+3:d=a:gosub570
+ 1660 pokexa+1,l:pokexa+2,h:return
+ 1670 rem  .. sys
+ 1680 gosub100:pokea,dec("85"):pokea+1,dec("04")
+ 1690 pokea+2,dec("86"):pokea+3,dec("03"):a=a+4
+ 1691 ifpeek(u)=44thenprint"sys: zu viele parameter":goto920
+ 1706 pokea,dec("ad"):pokea+1,dec("d5"):pokea+2,dec("03")
+ 1707 pokea+3,dec("85"):pokea+4,dec("02")
+ 1708 pokea+5,dec("20"):pokea+6,dec("6e"):pokea+7,dec("ff"):a=a+8:return
+ 1710 rem  .. poke
+ 1720 gosub100:pokea,dec("85"):pokea+1,dec("fa")
+ 1730 pokea+2,dec("86"):pokea+3,dec("fb"):a=a+4
+ 1740 ifpeek(u)<>44thenprint"poke: comma expected. ";:goto920
+ 1750 u=u+1:gosub100:pokea,dec("a0"):pokea+1,dec("fa")
+ 1760 pokea+2,dec("8c"):pokea+3,dec("b9"):pokea+4,dec("02")
+ 1761 pokea+5,dec("ae"):pokea+6,dec("d5"):pokea+7,dec("03")
+ 1762 pokea+8,dec("a0"):pokea+9,0
+ 1763 pokea+10,dec("20"):pokea+11,dec("77"):pokea+12,dec("ff")
+ 1769 a=a+13:return
+ 1770 rem  .. dec
+ 1771 u=u+1:ifpeek(u)<>40then920
+ 1772 u=u+1:gosub100:pokea,dec("85"):pokea+1,dec("24")
+ 1773 pokea+2,dec("86"):pokea+3,dec("25"):a=a+4
+ 1779 return
+ 1780 rem  .. bank
+ 1781 gosub100:pokea,dec("8d"):pokea+1,dec("d5"):pokea+2,dec("03")
+ 1782 a=a+3:return
+ 1790 rem  .. init
+ 1800 dimn(63),a(63),s(255),l(255),t$(75)
+ 1810 a=0:b=0:u=0:i=0:j=0:k=0:v=0:d=0
+ 1820 c=0:h=0:l=0:w=0
+ 1830 poke53281,0:poke53280,0:poke241,15
+ 1840 s$="test.comp":s=4864:z$=chr$(0)
+ 1850 print"basic start"bs
+ 1860 print"basic ende"be
+ 1870 print"name des quelltextes (* zum beenden)":inputs$
+ 1880 restore:ifs$="*"thenend
+ 1885 fori=0to12:readx:poke3056+i,x:next
+ 1890 print"startadresse "s"{left}{left}{left}{left}{left}{left}{left}";:inputs:print:a=s+6
+ 1900 d=a:gosub570:pokes,76:pokes+1,l:pokes+2,h
+ 1910 pokes+3,76:pokes+4,55:pokes+5,77
+ 1920 open15,8,15:open2,8,2,"0:"+s$
+ 1930 input#15,e1,e2$,e3,e4:ife1=0thenreturn
+ 1940 printe1;e2$;e3;e4
+ 1950 rem  .. ende
+ 1960 close2:close15
+ 1970 ifr=0then2020
+ 1980 fori=1tor:n=n(i):w=a(i):d=0
+ 1990 fort=0tom:ifs(t)=nthend=l(t):t=m
+ 2000 nextt:gosub570:pokew+1,l
+ 2010 pokew+2,h:nexti
+ 2020 ifg=0then2070
+ 2030 d=a:gosub570:pokes+4,l:pokes+5,h
+ 2040 readd:ifd<0then2070
+ 2050 pokea,d:a=a+1
+ 2060 goto2040
+ 2070 pokea,0:e=a+1
+ 2080 print"errors";ee
+ 2090 print"adressbereich";s;"{left}";e*-1
+ 2100 prints$;" kompiliert, zeit:";ti$
+ 2110 print"1-save 2-exec 3-comp 4-quit":poke208,0
+ 2120 getx$:ifx$="1"then2200
+ 2130 ifx$="2"then2170
+ 2140 ifx$="3"thengosub1840:goto590
+ 2150 ifx$="4"thenend
+ 2160 goto2120
+ 2170 fori=vstovs+51:pokei,0:next
+ 2180 syss:goto2110
+ 2190 rem .. save
+ 2200 n$=left$(s$,13)+".ml":input"name";n$
+ 2210 open15,8,15,"s0:"+n$:close15:t$=n$
+ 2220 d=peek(55)+peek(56)*256-len(t$)
+ 2230 poke8,d/256:poke7,d-peek(8)*256:poke6,len(t$):sys65469:poke6,1
+ 2240 poke7,8:poke8,1:sys65466
+ 2250 poke254,s/256:poke253,s-peek(254)*256:poke6,253:poke8,e/256
+ 2260 poke7,e-peek(8)*256:sys65496
+ 2270 if(peek(5)and1)or(st and 191)thenprint"disk error"
+ 2280 goto2110
+ 2285 rem  .. token-ausgabe: lda#<j-2:sta$61:lda#>j-2:sta$62:lda#token:jmp$5151
+ 2286 data169,0,133,97,169,0,133,98,169,0,76,81,81
+ 2290 rem  .. mul/div data
+ 2300 data133,101,134,102,162,0,134,103
+ 2310 data134,104,160,16,144,34,6,99
+ 2320 data38,100,38,103,38,104,56,165
+ 2330 data103,229,101,170,165,104,229,102
+ 2340 data144,6,134,103,133,104,230,99
+ 2350 data136,208,227,165,99,166,100,96
+ 2360 data70,104,102,103,102,100,102,99
+ 2370 data136,48,240,144,243,24,165,103
+ 2380 data101,101,133,103,165,104,101,102
+ 2390 data133,104,24,144,227,-1
